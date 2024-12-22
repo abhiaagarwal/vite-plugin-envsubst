@@ -1,19 +1,28 @@
 {
     "name": "vite-plugin-envsubst",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Vite plugin that transforms environmental variables into a global statement that can be replaced with `envsubst`.",
-    "type": "module",
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
-    "license": "MIT OR APACHE-2.0",
-    "files": [
-        "dist"
-    ],
+    "author": "Abhi Agarwal <abhiaagarwal01@gmail.com> (https://abhi.rodeo)",
+    "license": "(MIT OR Apache-2.0)",
+    "homepage": "https://github.com/abhiaagarwal/vite-plugin-envsubst",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/abhiaagarwal/vite-plugin-envsubst.git"
+    },
+    "bugs": {
+        "url": "https://github.com/abhiaagarwal/vite-plugin-envsubst/issues"
+    },
     "keywords": [
         "vite-plugin",
         "docker",
         "kubernetes"
+    ],
+    "type": "module",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist"
     ],
     "exports": {
         ".": {
@@ -30,6 +39,8 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.17.0",
+        "@types/bun": "^1.1.14",
+        "@types/node": "^22.10.2",
         "eslint": "^9.17.0",
         "prettier": "^3.4.2",
         "typescript": "~5.6.3",

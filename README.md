@@ -7,6 +7,7 @@ A Vite plugin that transforms `import.meta.env` references to use runtime enviro
 ### Problem
 
 When deploying SPAs in Docker, you often don't know your environment variables at build time. This is especially true when:
+
 - You're using a cloud provider that assigns URLs/ports dynamically
 - You have a dev/test/staging environment, where your resources may differ
 - Your app is designed to be self-hosted
@@ -16,6 +17,7 @@ The typical solution is to build separate images per environment, which is ineff
 ### Solution
 
 This plugin:
+
 1. Scans your `vite-env.d.ts` file for environment variable declarations
 2. Transforms all `import.meta.env` references to use a global object
 3. Injects a script in `index.html` that initializes environment variables with placeholder ENV variables.
@@ -30,43 +32,45 @@ npm install vite-plugin-envsubst --save-dev
 
 ```typescript
 // vite.config.ts
-import { defineConfig } from 'vite'
-import { envSubstPlugin } from 'vite-plugin-envsubst'
+import { defineConfig } from "vite";
+import { envSubstPlugin } from "vite-plugin-envsubst";
 
 export default defineConfig({
-  plugins: [
-    envSubstPlugin({
-      globalObject: 'globalThis' // optional, defaults to globalThis
-    })
-  ]
-})
+    plugins: [
+        envSubstPlugin({
+            globalObject: "globalThis", // optional, defaults to globalThis
+        }),
+    ],
+});
 ```
 
 Your environment variables must be declared in `src/vite-env.d.ts`:
+
 ```typescript
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_API_URL: string
-  readonly VITE_APP_TITLE: string
-  readonly UNUSED_VARIABLE: string // only variables prefixed with `envPrefix` (default VITE_) are transformed
+    readonly VITE_API_URL: string;
+    readonly VITE_APP_TITLE: string;
+    readonly UNUSED_VARIABLE: string; // only variables prefixed with `envPrefix` (default VITE_) are transformed
 }
 
 interface ImportMeta {
-  readonly env: ImportMetaEnv
+    readonly env: ImportMetaEnv;
 }
 ```
 
 Then use them in your code as normal:
+
 ```typescript
-console.log(import.meta.env.VITE_API_URL)
+console.log(import.meta.env.VITE_API_URL);
 ```
 
 When building with vite, this injects this script in your `index.html`, and transforms all `import.meta.env.VITE_*` variables into `globalThis.env.VITE_*` variables.
 
 ```html
 <script>
-    globalThis.env = globalThis.env || {}
+    globalThis.env = globalThis.env || {};
     globalThis.env.VITE_APP_TITLE = "${VITE_APP_TITLE}";
 </script>
 ```
