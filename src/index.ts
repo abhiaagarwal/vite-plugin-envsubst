@@ -104,7 +104,7 @@ const envSubstPlugin = (
                 {
                     tag: "script",
                     children: envSubstScript,
-                    injectTo: "head",
+                    injectTo: "head-prepend",
                 },
             ];
         },
