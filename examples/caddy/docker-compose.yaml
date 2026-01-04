@@ -1,0 +1,10 @@
+services:
+    example-app:
+        container_name: vite-plugin-envsubst-caddy-example
+        image: vite-plugin-envsubst-caddy-example:latest
+        build:
+            context: .
+        ports:
+            - 5173:80
+        environment:
+            - VITE_APP_TITLE=OVERRIDDEN_VARIABLE

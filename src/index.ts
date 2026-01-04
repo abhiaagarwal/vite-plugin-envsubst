@@ -4,6 +4,7 @@ import fs from "fs";
 
 type envSubstOptions = {
     globalObject?: string;
+    templateEngine?: "envsubst" | "caddy";
 };
 
 function parseEnvTypes(
@@ -35,9 +36,7 @@ function parseEnvTypes(
 }
 
 const envSubstPlugin = (
-    options: envSubstOptions = {
-        globalObject: "globalThis",
-    },
+    options: envSubstOptions = { globalObject: "globalThis" },
 ): PluginOption => {
     let viteConfig: ResolvedConfig;
     const envSubstOptions: envSubstOptions = options;
@@ -91,12 +90,22 @@ const envSubstPlugin = (
             }
             const globalObject = envSubstOptions.globalObject ?? "globalThis";
 
+            const templateEngine = envSubstOptions.templateEngine ?? "envsubst";
+            const envValueFor = (varName: string): string => {
+                if (templateEngine === "caddy") {
+                    return `{{env \\"${varName}\\"}}`;
+                }
+                return `\${${varName}}`;
+            };
+
             const envSubstScript = `
         ${globalObject}.env = ${globalObject}.env || {};
         ${envVarNames
             .map(
                 (varName) =>
-                    `${globalObject}.env.${varName} = "\${${varName}}";`,
+                    `${globalObject}.env.${varName} = "${envValueFor(
+                        varName,
+                    )}";`,
             )
             .join("\n")}`;
 

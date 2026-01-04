@@ -1,5 +1,5 @@
 {
-    "name": "envsubst-vite-example",
+    "name": "vite-plugin-envsubst-caddy-example",
     "private": true,
     "version": "0.0.0",
     "type": "module",
@@ -28,7 +28,7 @@
         "typescript": "~5.6.3",
         "typescript-eslint": "^8.18.1",
         "vite": "^6.0.5",
-        "vite-plugin-envsubst": "^0.1.0"
+        "vite-plugin-envsubst": "../.."
     },
     "prettier": {
         "printWidth": 80,
