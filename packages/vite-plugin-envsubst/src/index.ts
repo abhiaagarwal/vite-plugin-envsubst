@@ -102,7 +102,7 @@ const envSubstPlugin = (
                     (varName) =>
                         `${globalObject}.env.${varName} = "${envValueFor(varName)}";`,
                 ),
-            ].join("\n");
+            ].join("");
 
             return [
                 {

@@ -32,11 +32,9 @@ describe("envSubstPlugin", () => {
         const tags = plugin.transformIndexHtml?.();
         const script = Array.isArray(tags) ? tags[0]?.children : "";
 
-        expect(script).toMatchInlineSnapshot(`
-          "globalThis.env = globalThis.env || {};
-          globalThis.env.VITE_API_URL = "\${VITE_API_URL}";
-          globalThis.env.VITE_APP_TITLE = "\${VITE_APP_TITLE}";"
-        `);
+        expect(script).toMatchInlineSnapshot(
+            `"globalThis.env = globalThis.env || {};globalThis.env.VITE_API_URL = "\${VITE_API_URL}";globalThis.env.VITE_APP_TITLE = "\${VITE_APP_TITLE}";"`,
+        );
     });
 
     it("supports Caddy template placeholders", () => {
@@ -48,10 +46,8 @@ describe("envSubstPlugin", () => {
         const tags = plugin.transformIndexHtml?.();
         const script = Array.isArray(tags) ? tags[0]?.children : "";
 
-        expect(script).toMatchInlineSnapshot(`
-          "globalThis.env = globalThis.env || {};
-          globalThis.env.VITE_API_URL = "{{env "VITE_API_URL"}}";
-          globalThis.env.VITE_APP_TITLE = "{{env "VITE_APP_TITLE"}}";"
-        `);
+        expect(script).toMatchInlineSnapshot(
+            `"globalThis.env = globalThis.env || {};globalThis.env.VITE_API_URL = "{{env "VITE_API_URL"}}";globalThis.env.VITE_APP_TITLE = "{{env "VITE_APP_TITLE"}}";"`,
+        );
     });
 });

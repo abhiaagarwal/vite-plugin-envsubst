@@ -4,6 +4,8 @@ services:
         image: vite-plugin-envsubst-example:latest
         build:
             context: .
+            additional_contexts:
+                repo: ../..
         ports:
             - 5173:80
         environment:
