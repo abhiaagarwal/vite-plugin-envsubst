@@ -22,9 +22,7 @@ function parseEnvTypes(
     const interfaceContent = interfaceMatch[1];
     const prefixPattern =
         prefixes.length > 0
-            ? `(${prefixes
-                  .map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-                  .join("|")})`
+            ? `(${prefixes.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`
             : "";
     const envVarRegex = new RegExp(
         `readonly\\s+(${prefixPattern}\\w+)\\s*:`,
@@ -93,21 +91,18 @@ const envSubstPlugin = (
             const templateEngine = envSubstOptions.templateEngine ?? "envsubst";
             const envValueFor = (varName: string): string => {
                 if (templateEngine === "caddy") {
-                    return `{{env \\"${varName}\\"}}`;
+                    return `{{env "${varName}"}}`;
                 }
                 return `\${${varName}}`;
             };
 
-            const envSubstScript = `
-        ${globalObject}.env = ${globalObject}.env || {};
-        ${envVarNames
-            .map(
-                (varName) =>
-                    `${globalObject}.env.${varName} = "${envValueFor(
-                        varName,
-                    )}";`,
-            )
-            .join("\n")}`;
+            const envSubstScript = [
+                `${globalObject}.env = ${globalObject}.env || {};`,
+                ...envVarNames.map(
+                    (varName) =>
+                        `${globalObject}.env.${varName} = "${envValueFor(varName)}";`,
+                ),
+            ].join("\n");
 
             return [
                 {
