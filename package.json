@@ -9,6 +9,7 @@
         "build": "turbo run build",
         "build:nginx": "turbo run build --filter=vite-plugin-envsubst-nginx-example",
         "build:caddy": "turbo run build --filter=vite-plugin-envsubst-caddy-example",
+        "format:check": "oxfmt --check .",
         "format": "oxfmt --write"
     },
     "devDependencies": {
