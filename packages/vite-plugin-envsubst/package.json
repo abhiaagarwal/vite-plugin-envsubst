@@ -1,6 +1,6 @@
 {
     "name": "vite-plugin-envsubst",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Vite plugin that transforms environmental variables into a global statement that can be replaced with `envsubst` or Caddy's templating engine.",
     "keywords": [
         "caddy",
