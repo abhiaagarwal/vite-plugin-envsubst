@@ -12,16 +12,70 @@ const resolveConfig = (overrides: Partial<ResolvedConfig> = {}) =>
         ...overrides,
     }) as ResolvedConfig;
 
+const transformCode = (
+    transformed: ReturnType<NonNullable<PluginOption["transform"]>>,
+) => {
+    if (!transformed) {
+        return undefined;
+    }
+    if (typeof transformed === "string") {
+        return transformed;
+    }
+    if ("code" in transformed) {
+        return transformed.code;
+    }
+    return undefined;
+};
+
 describe("envSubstPlugin", () => {
-    it("replaces import.meta.env references with globalThis.env", () => {
+    it("replaces only declared import.meta.env references with globalThis.env", () => {
         const plugin = envSubstPlugin();
         plugin.configResolved?.(resolveConfig());
 
-        const code = "const url = import.meta.env.VITE_API_URL;";
-        const transformed = plugin.transform?.(code);
+        const code =
+            "const url = import.meta.env.VITE_API_URL; const mode = import.meta.env.MODE; const other = import.meta.env.OTHER_VAR;";
+        const transformed = plugin.transform?.(code, "/src/main.ts");
+        const transformedCode = transformCode(transformed);
 
-        expect(transformed).toMatchInlineSnapshot(
-            `"const url = globalThis.env.VITE_API_URL;"`,
+        expect(transformedCode).toMatchInlineSnapshot(
+            `"const url = globalThis.env.VITE_API_URL; const mode = import.meta.env.MODE; const other = import.meta.env.OTHER_VAR;"`,
+        );
+        if (
+            transformed &&
+            typeof transformed !== "string" &&
+            "map" in transformed
+        ) {
+            expect(transformed.map).toBeDefined();
+        }
+    });
+
+    it("does not rewrite assignments", () => {
+        const plugin = envSubstPlugin();
+        plugin.configResolved?.(resolveConfig());
+
+        const code =
+            "import.meta.env.VITE_API_URL = 'local'; const url = import.meta.env.VITE_API_URL;";
+        const transformed = plugin.transform?.(code, "/src/main.ts");
+        const transformedCode = transformCode(transformed);
+
+        expect(transformedCode).toMatchInlineSnapshot(
+            `"import.meta.env.VITE_API_URL = 'local'; const url = globalThis.env.VITE_API_URL;"`,
+        );
+    });
+
+    it("supports include/exclude filtering", () => {
+        const plugin = envSubstPlugin({
+            include: [/app\.ts$/],
+        });
+        plugin.configResolved?.(resolveConfig());
+
+        const code = "const url = import.meta.env.VITE_API_URL;";
+        const excludedTransform = plugin.transform?.(code, "/src/main.ts");
+        const includedTransform = plugin.transform?.(code, "/src/app.ts");
+
+        expect(excludedTransform).toBeUndefined();
+        expect(transformCode(includedTransform)).toBe(
+            "const url = globalThis.env.VITE_API_URL;",
         );
     });
 

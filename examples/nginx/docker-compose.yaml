@@ -3,9 +3,8 @@ services:
         container_name: vite-plugin-envsubst-example
         image: vite-plugin-envsubst-example:latest
         build:
-            context: .
-            additional_contexts:
-                repo: ../..
+            context: ../..
+            dockerfile: examples/nginx/Dockerfile
         ports:
             - 5173:80
         environment:

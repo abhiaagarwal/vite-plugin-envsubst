@@ -19,7 +19,7 @@ The typical solution is to build separate images per environment, which is ineff
 This plugin:
 
 1. Scans your `vite-env.d.ts` file for environment variable declarations
-2. Transforms all `import.meta.env` references to use a global object
+2. Transforms only matching declared `import.meta.env` references to use a global object
 3. Injects a script in `index.html` that initializes environment variables with placeholder ENV variables.
 
 ## Install
@@ -40,6 +40,8 @@ export default defineConfig({
         envSubstPlugin({
             globalObject: "globalThis", // optional, defaults to globalThis
             templateEngine: "envsubst", // optional, "envsubst" (default) or "caddy"
+            include: [/\\.[cm]?[jt]sx?$/], // optional, files to transform
+            exclude: [/node_modules/], // optional, files to skip
         }),
     ],
 });
@@ -67,7 +69,7 @@ Then use them in your code as normal:
 console.log(import.meta.env.VITE_API_URL);
 ```
 
-### Nginx
+### Nginx with `envsubst`
 
 When building with vite, this injects this script in your `index.html`, and transforms all `import.meta.env.VITE_*` variables into `globalThis.env.VITE_*` variables.
 
@@ -113,16 +115,19 @@ envSubstPlugin({
 ```html
 <script>
     globalThis.env = globalThis.env || {};
-    globalThis.env.VITE_APP_TITLE = "{{env \"VITE_APP_TITLE\"}}";
+    globalThis.env.VITE_APP_TITLE = "{{env "VITE_APP_TITLE"}}";
 </script>
 ```
 
 ## Features
 
 - Transforms only variables declared in your `vite-env.d.ts`
+- Guards against rewriting assignments like `import.meta.env.VAR = ...`
+- Uses sourcemap-preserving string transforms via `rolldown-string`
+- Optional include/exclude filtering for faster builds
 - Respects Vite's `envPrefix` configuration
 - TypeScript
-- Zero runtime dependencies
+- Only one runtime dependencies (`rolldown-string`)
 - Only runs during build (so dev server works as expected)
 
 ## License

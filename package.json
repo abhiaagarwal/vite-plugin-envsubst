@@ -1,12 +1,19 @@
 {
+    "name": "vite-plugin-envsubst-monorepo",
+    "private": true,
+    "packageManager": "bun@1.3.5",
     "workspaces": [
         "packages/*",
         "examples/*"
     ],
     "scripts": {
+        "build": "turbo run build",
+        "build:nginx": "turbo run build --filter=vite-plugin-envsubst-nginx-example",
+        "build:caddy": "turbo run build --filter=vite-plugin-envsubst-caddy-example",
         "format": "oxfmt --write"
     },
     "devDependencies": {
-        "oxfmt": "^0.21.0"
+        "oxfmt": "^0.21.0",
+        "turbo": "^2.8.9"
     }
 }
