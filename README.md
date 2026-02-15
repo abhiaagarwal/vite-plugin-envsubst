@@ -1,6 +1,6 @@
 # vite-plugin-envsubst
 
-A Vite plugin that transforms `import.meta.env` references to use runtime environment variables via `envsubst`. Built for deploying SPAs in Docker containers where the environment isn't known at build time, to prevent having to build per environment.
+A Vite plugin that transforms `import.meta.env` references to use runtime environment variables via `envsubst` or Caddy's templating engine. Built for deploying SPAs in Docker containers where the environment isn't known at build time, to prevent having to build per environment.
 
 ## Why
 
@@ -19,7 +19,7 @@ The typical solution is to build separate images per environment, which is ineff
 This plugin:
 
 1. Scans your `vite-env.d.ts` file for environment variable declarations
-2. Transforms all `import.meta.env` references to use a global object
+2. Transforms only matching declared `import.meta.env` references to use a global object
 3. Injects a script in `index.html` that initializes environment variables with placeholder ENV variables.
 
 ## Install
@@ -39,6 +39,9 @@ export default defineConfig({
     plugins: [
         envSubstPlugin({
             globalObject: "globalThis", // optional, defaults to globalThis
+            templateEngine: "envsubst", // optional, "envsubst" (default) or "caddy"
+            include: [/\\.[cm]?[jt]sx?$/], // optional, files to transform
+            exclude: [/node_modules/], // optional, files to skip
         }),
     ],
 });
@@ -65,6 +68,8 @@ Then use them in your code as normal:
 ```typescript
 console.log(import.meta.env.VITE_API_URL);
 ```
+
+### Nginx with `envsubst`
 
 When building with vite, this injects this script in your `index.html`, and transforms all `import.meta.env.VITE_*` variables into `globalThis.env.VITE_*` variables.
 
@@ -95,12 +100,34 @@ envsubst < /usr/share/nginx/html/index.html > /usr/share/nginx/html/index.html.t
 mv /usr/share/nginx/html/index.html.tmp /usr/share/nginx/html/index.html
 ```
 
+Note that `envsubst` is typically not included in hardened nginx images, such as [chainguard's](https://github.com/chainguard-images/images/issues/93).
+
+### Caddy
+
+To use Caddy's templating engine instead of envsubst:
+
+```typescript
+envSubstPlugin({
+    templateEngine: "caddy",
+});
+```
+
+```html
+<script>
+    globalThis.env = globalThis.env || {};
+    globalThis.env.VITE_APP_TITLE = "{{env "VITE_APP_TITLE"}}";
+</script>
+```
+
 ## Features
 
 - Transforms only variables declared in your `vite-env.d.ts`
+- Guards against rewriting assignments like `import.meta.env.VAR = ...`
+- Uses sourcemap-preserving string transforms via `rolldown-string`
+- Optional include/exclude filtering for faster builds
 - Respects Vite's `envPrefix` configuration
 - TypeScript
-- Zero runtime dependencies
+- Only one runtime dependencies (`rolldown-string`)
 - Only runs during build (so dev server works as expected)
 
 ## License
